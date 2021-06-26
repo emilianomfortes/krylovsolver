@@ -12,3 +12,6 @@ times = np.linspace(0.0, 10.0, 10)
 
 result = sesolve(H, psi0, times, [jmat(30,'z'), jmat(30, '+')])
 result_k = krylovsolve(H, psi0=psi0, tlist=times, krylov_dim=10, e_ops=[jmat(30,'z'), jmat(30, '+')])
+
+print(f'Difference between Krylov and Sesolve Z expectation value {result.expect[0][-1]-result_k.expect[0][-1]})
+print(f'Difference between Krylov and Sesolve + expectation value {result.expect[1][-1]-result_k.expect[1][-1]})
