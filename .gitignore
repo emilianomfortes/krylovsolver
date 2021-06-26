@@ -1,0 +1,8 @@
+.vscode 
+.venm
+.venv
+**/__pycache__
+*/.ipynb_checkpoints
+line_profiler
+/venv/
+.idea
