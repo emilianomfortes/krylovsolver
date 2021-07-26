@@ -34,6 +34,30 @@ TEMPLATE_REGISTRY: "my-example-registry"
 PREFIX_REGISTRY: "sam_templates/my-example-registry"
 ```
 
+```text
+scikit-learn
+pandas
+```
+
+```python
+def handler(event, context): 
+
+    # Retrieve Input data
+    input_data = event['body']
+
+    # Make a prediction
+    prediction = my_model.predict(input_data)
+
+    # prediction = model.predict(url)
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(prediction)
+    }
+
+    return response
+```
+
+
 
 Contribute
 ----------
