@@ -29,6 +29,12 @@ Documentation
 The documentation website is coming up soon.
 
 
+```yaml
+TEMPLATE_REGISTRY: "my-example-registry"
+PREFIX_REGISTRY: "sam_templates/my-example-registry"
+```
+
+
 Contribute
 ----------
 
