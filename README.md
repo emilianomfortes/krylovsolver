@@ -1,10 +1,6 @@
 # krylov
 # krylov codes to add to qutip once properly tested
 
-
-<<<<<<< Updated upstream
-# 
-=======
 [E. M. Fortes](https://github.com/emilianomfortes),
 [J. M. Ruffinelli](https://github.com/ruffa),
 [M. Larocca](https://scholar.google.com/citations?user=mpQ0hgwAAAAJ&hl=es)
@@ -90,4 +86,3 @@ Citing
 ------------
 
 If you use our error bound approach for the Krylov approximation in your research, please cite the original paper available [here](https://arxiv.org/abs/2107.09805).
->>>>>>> Stashed changes
