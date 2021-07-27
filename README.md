@@ -28,12 +28,18 @@ Installation
 -------------
 
 Dependencies:
-
+```text
 qutip
-
 numpy
-
 scipy
+```
+
+PyKrylovSolver is not currently in PyPi. You can install directly from GitHub by doing
+```
+pip install git+https://github.com/emilianomfortes/krylovsolver/
+```
+
+
 
 
 
