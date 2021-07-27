@@ -6,6 +6,7 @@ import numpy as np
 
 
 def basic_test(N=9):
+    
     dim = 2 ** N
     psi0 = np.random.random(dim) + 1j * np.random.random(dim)
     psi0 = psi0 / np.linalg.norm(psi0)
@@ -17,8 +18,8 @@ def basic_test(N=9):
 
 
 def test_vs_sesolve(N=9, hamiltonian='random'):
+    
     dim = 2 ** N
-
     if hamiltonian == 'random':
         H = h_random(dim)
         H = Qobj(H)
