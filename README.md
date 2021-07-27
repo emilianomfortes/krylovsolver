@@ -44,36 +44,25 @@ Documentation
 
 The documentation website is coming up soon.
 
-
-```yaml
-TEMPLATE_REGISTRY: "my-example-registry"
-PREFIX_REGISTRY: "sam_templates/my-example-registry"
-```
-
-```text
-scikit-learn
-pandas
-```
-
 ```python
-def handler(event, context): 
+from PyKrylovsolver.krylovsolver import krylovsolve
+from qutip.qobj import Qobj
+from qutip import jmat
+import numpy as np
+from PyKrylovsolver.hamiltonians import h_sho, h_random, h_ising_transverse
+import numpy as np
+from qutip import sesolve
 
-    # Retrieve Input data
-    input_data = event['body']
 
-    # Make a prediction
-    prediction = my_model.predict(input_data)
-
-    # prediction = model.predict(url)
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(prediction)
-    }
-
-    return response
+dim = 2 ** N
+psi0 = np.random.random(dim) + 1j * np.random.random(dim)
+psi0 = psi0 / np.linalg.norm(psi0)
+psi = Qobj(psi0)
+H = h_random(dim)
+H = Qobj(H)
+tlist = np.linspace(0, 1, 100)
+psi_evolved = krylovsolve(H, psi, tlist=tlist, tolerance=1e-2, krylov_dim=5, progress_bar=False, sparse=True)
 ```
-
-
 
 Contribute
 ----------
