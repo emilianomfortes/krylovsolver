@@ -11,7 +11,7 @@ from qutip.qobj import Qobj
 from qutip.expect import expect
 from qutip.ui.progressbar import BaseProgressBar, TextProgressBar
 from qutip.solver import Result
-from src_clean.utils import _happy_breakdown, _make_partitions, optimizer
+from PyKrylovsolver.utils import _happy_breakdown, _make_partitions, optimizer
 
 
 def krylovsolve(
