@@ -35,41 +35,73 @@ PyKrylovSolver is not currently in PyPi. You can install directly from GitHub by
 pip install git+https://github.com/emilianomfortes/krylovsolver/
 ```
 
-
-
-
-
 Documentation
 -------------
+
+ Time evolution of state vectors for time independent Hamiltonians.
+
+ Evolve the state vector ("psi0") finding an approximation for the time 
+ evolution operator of Hamiltonian ("H") by obtaining the projection of 
+ the time evolution operator on a set of small dimensional Krylov 
+ subspaces (m<<dim(H)).
+
+ The output is either the state vector or the expectation values of supplied 
+ operators ("e_ops") at arbitrary points in a time range built from inputs 
+ "t0", "tf" and "dt". Optionally, a custom ("tlist") without an even time 
+ stepping between times can be provided, but the algorithm will become 
+ slower. 
+ **Additional options**
+
+ Additional options to krylovsolve can be set with the following:
+
+ "store_states": stores states even though expectation values are requested
+ via the "e_ops" argument.
+ "store_final_state": store final state even though expectation values are 
+ requested via the "e_ops" argument.
+ "krylov_algorithm": default behavior uses lanczos algorithm to calculate
+ the different Krylov subspaces, and it is only valid for self-adjoint 
+ operators. If by any chance you decide to use this evolution on a non
+ self-adjoint Hamiltonian, Arnoldi iteration (slower than lanczos but does 
+ not require self-adjoint) can be enabled. Another alternative is to use
+ Krylov subspaces obtained from Taylor expansion of the Hamiltonian.
+
 
 ```text
 Parameters
    -------------
-sparse
-store_final_state
-krylov_dim
-steps
-store_states
-tolerance
-psi
-H : :class:`qutip.Qobj`
-   System Hamiltonian.
+ H : :class:`qutip.Qobj`
+    System Hamiltonian.
+ psi0 : :class: `qutip.Qobj`
+     initial state vector (ket).
 
-t0, tf : :float:
-   values to create an evenely spaced tlist on which time evolution will be
-   evaluated.
+ tlist : None / *list* / *array*
+    List of times on which to evolve the initial state. If provided, it overrides
+    t0, tf and dt parameters.
 
-tlist : None / *list* / *array*
-   list of times on which to evolve the initial state. If provided, it overrides
-   t0, tf and dt parameters.
+ krylov_dim: int
+     Dimension of Krylov approximation subspaces used for the time evolution
+     approximation.
 
-e_ops : None / list of :class:`qutip.Qobj` / callback function single
-    single operator or list of operators for which to evaluate
-    expectation values.
+ e_ops : None / list of :class:`qutip.Qobj`
+     Single operator or list of operators for which to evaluate
+     expectation values.
+ if store_states : bool (default False)
+     If e_ops is provided, store each state vector corresponding to each time
+     in tlist.
+ store_final_state : bool (default False)
+     If e_ops is provided, store the final state vector of the evolution.
 
-progress_bar : None / BaseProgressBar
-    Optional instance of BaseProgressBar, or a subclass thereof, for
-    showing the progress of the simulation.          
+ progress_bar : None / BaseProgressBar
+     Optional instance of BaseProgressBar, or a subclass thereof, for
+     showing the progress of the simulation.          
+
+ sparse : bool (default False)
+     Use np.array to represent system Hamiltonians. If True, scipy sparse
+     arrays are used instead.
+
+ tolerance : :float: (default 1e-7)
+     Minimum bound value for the final state infidelity with respect to 
+     the exact state.       
 
 Returns
 ---------
@@ -104,6 +136,10 @@ tlist = np.linspace(0, 1, 100)
 
 psi_evolved = krylovsolve(H, psi, tlist=tlist, tolerance=1e-2, krylov_dim=5, progress_bar=False, sparse=True)
 ```
+
+Krylov Aproximation
+-------------------
+
 
 Contribute
 ----------
