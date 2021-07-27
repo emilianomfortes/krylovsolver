@@ -46,11 +46,7 @@ Documentation
  subspaces (m<<dim(H)).
 
  The output is either the state vector or the expectation values of supplied 
- operators ("e_ops") at arbitrary points in a time range built from inputs 
- "t0", "tf" and "dt". 
- Optionally, a custom ("tlist") without an even time 
- stepping between times can be provided, but the algorithm will become 
- slower. 
+ operators ("e_ops"), computed at each time in a list ("tlist"). 
  **Additional options**
 
  Additional options to krylovsolve can be set with the following:
