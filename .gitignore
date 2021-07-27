@@ -6,3 +6,4 @@
 line_profiler
 /venv/
 .idea
+requirements.txt
