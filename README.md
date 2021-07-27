@@ -101,10 +101,9 @@ Returns
  result: :class:`qutip.Result`
 
     An instance of the class :class:`qutip.Result`, which contains
-    either an *array* `result.expect` of expectation values for the times
-    specified by range('t0', 'tf', 'dt') or `tlist`, or an *array* `result.states` 
-    of state vectors corresponding to the times in range('t0', 'tf', 'dt') or
-    `tlist` [if `e_ops` is an empty list].        
+    either an *array* `result.expect` of expectation values for operators
+    `e_ops` at times specified by the user input `tlist`, or an *array* 
+    `result.states` of state vectors corresponding to the times in `tlist`.        
 ```
 
 The documentation website is coming up soon.
