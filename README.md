@@ -110,7 +110,7 @@ The documentation website is coming up soon.
 
 ```python
 from PyKrylovsolver.krylovsolver import krylovsolve
-from PyKrylovsolver.hamiltonians import  h_ising_transverse
+from PyKrylovsolver.hamiltonians import h_ising_transverse
 from qutip.qobj import Qobj
 import numpy as np
 
