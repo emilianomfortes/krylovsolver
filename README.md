@@ -47,7 +47,8 @@ Documentation
 
  The output is either the state vector or the expectation values of supplied 
  operators ("e_ops") at arbitrary points in a time range built from inputs 
- "t0", "tf" and "dt". Optionally, a custom ("tlist") without an even time 
+ "t0", "tf" and "dt". 
+ Optionally, a custom ("tlist") without an even time 
  stepping between times can be provided, but the algorithm will become 
  slower. 
  **Additional options**
@@ -56,14 +57,9 @@ Documentation
 
  "store_states": stores states even though expectation values are requested
  via the "e_ops" argument.
+ 
  "store_final_state": store final state even though expectation values are 
  requested via the "e_ops" argument.
- "krylov_algorithm": default behavior uses lanczos algorithm to calculate
- the different Krylov subspaces, and it is only valid for self-adjoint 
- operators. If by any chance you decide to use this evolution on a non
- self-adjoint Hamiltonian, Arnoldi iteration (slower than lanczos but does 
- not require self-adjoint) can be enabled. Another alternative is to use
- Krylov subspaces obtained from Taylor expansion of the Hamiltonian.
 
 
 ```text
@@ -85,9 +81,11 @@ Parameters
  e_ops : None / list of :class:`qutip.Qobj`
      Single operator or list of operators for which to evaluate
      expectation values.
+     
  if store_states : bool (default False)
      If e_ops is provided, store each state vector corresponding to each time
      in tlist.
+     
  store_final_state : bool (default False)
      If e_ops is provided, store the final state vector of the evolution.
 
