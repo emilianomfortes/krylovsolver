@@ -47,6 +47,7 @@ Documentation
 
  The output is either the state vector or the expectation values of supplied 
  operators ("e_ops"), computed at each time in a list ("tlist"). 
+ 
  **Additional options**
 
  Additional options to krylovsolve can be set with the following:
