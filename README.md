@@ -1,5 +1,4 @@
-# krylov
-# krylov codes to add to qutip once properly tested
+# PyKrylovSolver
 
 [E. M. Fortes](https://github.com/emilianomfortes),
 [J. M. Ruffinelli](https://github.com/ruffa),
@@ -8,8 +7,6 @@ and [D. A. Wisniacki](https://scholar.google.com/citations?user=1tZ7BqoAAAAJ&hl=
 
 
 The Krylov approximation method provides an efficient approach to perform time-evolutions of quantum states for systems with large-dimensional Hilbert spaces. 
-
-The approximation can be described in terms of the Hamiltonian $H$, the initial state $\psi(t_0)$ and the final time $t_f$.
 
 
 
