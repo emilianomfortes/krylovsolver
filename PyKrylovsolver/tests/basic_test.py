@@ -1,15 +1,12 @@
-from src_clean.krylovsolver import krylovsolve
+from PyKrylovsolver.krylovsolver import krylovsolve
+from PyKrylovsolver.hamiltonians import h_sho, h_random, h_ising_transverse
 from qutip.qobj import Qobj
-from qutip import jmat
+from qutip import jmat, sesolve
 import numpy as np
-from src_clean.krylovsolver import krylovsolve
-
-from src_clean.hamiltonians import h_sho, h_random, h_ising_transverse
-import numpy as np
-from qutip import sesolve
 
 
 def basic_test(N=9):
+    
     dim = 2 ** N
     psi0 = np.random.random(dim) + 1j * np.random.random(dim)
     psi0 = psi0 / np.linalg.norm(psi0)
@@ -21,8 +18,8 @@ def basic_test(N=9):
 
 
 def test_vs_sesolve(N=9, hamiltonian='random'):
+    
     dim = 2 ** N
-
     if hamiltonian == 'random':
         H = h_random(dim)
         H = Qobj(H)
