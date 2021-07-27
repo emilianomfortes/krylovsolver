@@ -42,77 +42,44 @@ pip install git+https://github.com/emilianomfortes/krylovsolver/
 Documentation
 -------------
 
-```python
-def krylovsolve(H, psi, tlist, t0, tf, steps, e_ops, tolerance, krylov_dim, store_states,
-                store_final_state, progress_bar, sparse)
-
-    Time evolution of state vectors for time independent Hamiltonians.
-    
-    Evolve the state vector ("psi0") finding an approximation for the time 
-    evolution operator of Hamiltonian ("H") by obtaining the projection of 
-    the time evolution operator on a set of small dimensional Krylov 
-    subspaces (m<<dim(H)).
-    
-    The output is either the state vector or the expectation values of supplied 
-    operators ("e_ops") at arbitrary points in a time range built from inputs 
-    "t0", "tf" and "dt". Optionally, a custom ("tlist") without an even time 
-    stepping between times can be provided, but the algorithm will become 
-    slower. 
-
-    **Additional options**
-    
-    Additional options to krylovsolve can be set with the following:
-    
-    "store_states": stores states even though expectation values are requested
-    via the "e_ops" argument.
-    "store_final_state": store final state even though expectation values are 
-    requested via the "e_ops" argument.
-    "krylov_algorithm": default behavior uses lanczos algorithm to calculate
-    the different Krylov subspaces, and it is only valid for self-adjoint 
-    operators. If by any chance you decide to use this evolution on a non
-    self-adjoint Hamiltonian, Arnoldi iteration (slower than lanczos but does 
-    not require self-adjoint) can be enabled. Another alternative is to use
-    Krylov subspaces obtained from Taylor expansion of the Hamiltonian.
-   
-   Parameters
+```text
+Parameters
    -------------
-    sparse
-    store_final_state
-    krylov_dim
-    steps
-    store_states
-    tolerance
-    psi
-    H : :class:`qutip.Qobj`
-       System Hamiltonian.
+sparse
+store_final_state
+krylov_dim
+steps
+store_states
+tolerance
+psi
+H : :class:`qutip.Qobj`
+   System Hamiltonian.
 
-    t0, tf : :float:
-       values to create an evenely spaced tlist on which time evolution will be
-       evaluated.
-       
-    tlist : None / *list* / *array*
-       list of times on which to evolve the initial state. If provided, it overrides
-       t0, tf and dt parameters.
-       
-    e_ops : None / list of :class:`qutip.Qobj` / callback function single
-        single operator or list of operators for which to evaluate
-        expectation values.
+t0, tf : :float:
+   values to create an evenely spaced tlist on which time evolution will be
+   evaluated.
 
-    progress_bar : None / BaseProgressBar
-        Optional instance of BaseProgressBar, or a subclass thereof, for
-        showing the progress of the simulation.          
-    
-    Returns
-    ---------
-     result: :class:`qutip.Result`
-     
-        An instance of the class :class:`qutip.Result`, which contains
-        either an *array* `result.expect` of expectation values for the times
-        specified by range('t0', 'tf', 'dt') or `tlist`, or an *array* `result.states` 
-        of state vectors corresponding to the times in range('t0', 'tf', 'dt') or
-        `tlist` [if `e_ops` is an empty list].               
+tlist : None / *list* / *array*
+   list of times on which to evolve the initial state. If provided, it overrides
+   t0, tf and dt parameters.
 
-                
+e_ops : None / list of :class:`qutip.Qobj` / callback function single
+    single operator or list of operators for which to evaluate
+    expectation values.
+
+progress_bar : None / BaseProgressBar
+    Optional instance of BaseProgressBar, or a subclass thereof, for
+    showing the progress of the simulation.          
+
+Returns
+---------
+ result: :class:`qutip.Result`
+
+    An instance of the class :class:`qutip.Result`, which contains
+    either an *array* `result.expect` of expectation values for the times
+    specified by range('t0', 'tf', 'dt') or `tlist`, or an *array* `result.states` 
+    of state vectors corresponding to the times in range('t0', 'tf', 'dt') or
+    `tlist` [if `e_ops` is an empty list].        
 ```
 
 The documentation website is coming up soon.
