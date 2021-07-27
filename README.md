@@ -50,17 +50,18 @@ from PyKrylovsolver.hamiltonians import  h_ising_transverse
 from qutip.qobj import Qobj
 import numpy as np
 
+N = 8
 dim = 2 ** N
-psi0 = np.random.random(dim) + 1j * np.random.random(dim)
-psi0 = psi0 / np.linalg.norm(psi0)
-psi = Qobj(psi0)
+psi = np.random.random(dim) + 1j * np.random.random(dim)
+psi = psi / np.linalg.norm(psi)
+psi = Qobj(psi)
 
-hx = np.ones(N)
-hz = 0.5 * np.ones(N)
-Jx, Jy = 0 * np.ones(N), 0 * np.ones(N)
-Jz = np.ones(N)
+hx, hz = np.ones(N), 0.5 * np.ones(N)
+Jx, Jy, Jz = 0 * np.ones(N), 0 * np.ones(N), np.ones(N)
 H = h_ising_transverse(N, hx, hz, Jx, Jy, Jz)
+
 tlist = np.linspace(0, 1, 100)
+
 psi_evolved = krylovsolve(H, psi, tlist=tlist, tolerance=1e-2, krylov_dim=5, progress_bar=False, sparse=True)
 ```
 
