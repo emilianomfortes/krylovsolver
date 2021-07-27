@@ -64,6 +64,7 @@ Parameters
    -------------
  H : :class:`qutip.Qobj`
     System Hamiltonian.
+    
  psi0 : :class: `qutip.Qobj`
      initial state vector (ket).
 
