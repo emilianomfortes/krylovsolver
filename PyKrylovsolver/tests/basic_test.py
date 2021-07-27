@@ -1,12 +1,8 @@
-from src_clean.krylovsolver import krylovsolve
+from PyKrylovsolver.krylovsolver import krylovsolve
+from PyKrylovsolver.hamiltonians import h_sho, h_random, h_ising_transverse
 from qutip.qobj import Qobj
-from qutip import jmat
+from qutip import jmat, sesolve
 import numpy as np
-from src_clean.krylovsolver import krylovsolve
-
-from src_clean.hamiltonians import h_sho, h_random, h_ising_transverse
-import numpy as np
-from qutip import sesolve
 
 
 def basic_test(N=9):
