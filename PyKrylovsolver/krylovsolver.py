@@ -185,11 +185,8 @@ def krylovsolve(
          if e_ops:
             for idx, op in enumerate(e_ops):
                 krylov_results.expect[idx] += [expect(op, psi0)]
-            if store_states:
+            if store_states or store_final_state:
                 krylov_results.states += [psi0]
-            if store_final_state:
-                if pdx == len(partitions) - 1:
-                    krylov_results.states += [psi0]
          else:
             krylov_results.states += [psi0]        
         return krylov_results
