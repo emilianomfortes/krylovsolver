@@ -157,9 +157,6 @@ def krylovsolve(
     ), "The state vector and the Hamiltonian must share the same \
         dimension."
 
-    tf = tlist[-1]
-    t0 = tlist[0]
-
     # transform state type from Qobj to np.ndarray for faster operations
     if isinstance(psi0, Qobj):
         _psi = psi0.full().copy()
@@ -180,8 +177,27 @@ def krylovsolve(
     if progress_bar:
         pbar.start(len(partitions))
 
-    # Lazy iteration
+    # create output container
     krylov_results = Result()
+    
+    # if there is a unique time-step in tlist, the initial state (or its expectation value) is returned.
+    if len(tlist) < 1:
+         if e_ops:
+            for idx, op in enumerate(e_ops):
+                krylov_results.expect[idx] += [expect(op, psi0)]
+            if store_states:
+                krylov_results.states += [psi0]
+            if store_final_state:
+                if pdx == len(partitions) - 1:
+                    krylov_results.states += [psi0]
+         else:
+            krylov_results.states += [psi0]        
+        return krylov_results
+    
+    tf = tlist[-1]
+    t0 = tlist[0]
+        
+    # Lazy iteration
     psi_norm = np.linalg.norm(_psi)
     evolved_states = _evolve_krylov_tlist(
         H=_H,
