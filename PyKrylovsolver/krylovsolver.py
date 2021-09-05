@@ -182,14 +182,14 @@ def krylovsolve(
     
     # if there is a unique time-step in tlist, the initial state (or its expectation value) is returned.
     if len(tlist) < 1:
-         if e_ops:
+        if e_ops:
             for idx, op in enumerate(e_ops):
                 krylov_results.expect[idx] += [expect(op, psi0)]
             if store_states or store_final_state:
                 krylov_results.states += [psi0]
-         else:
+        else:
             krylov_results.states += [psi0]        
-         return krylov_results
+        return krylov_results
     
     tf = tlist[-1]
     t0 = tlist[0]
