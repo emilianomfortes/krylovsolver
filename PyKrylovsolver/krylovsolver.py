@@ -386,10 +386,10 @@ def lanczos_algorithm(
 
         beta = np.linalg.norm(w)
 
-        if beta < 1e-7:
-            v, T_m = _happy_breakdown(T_m, v, beta, w, j)
-            print("is a happy breakdown!")
-            return v, T_m
+#         if beta < 1e-7:
+#             v, T_m = _happy_breakdown(T_m, v, beta, w, j)
+#             print("is a happy breakdown!")
+#             return v, T_m
 
         v[j, :] = w / beta
         w_prime = dot_mul(H, v[j, :], sparse=sparse)
