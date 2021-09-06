@@ -405,7 +405,7 @@ def lanczos_algorithm(
             T_m_happy = T_m[0:j,0:j]
             
             # v, T_m = _happy_breakdown(T_m, v, beta, w, j)
-            print("is a happy breakdown!")
+            # print("is a happy breakdown!")
             return v_happy, T_m_happy
 
         v[j, :] = w / beta
