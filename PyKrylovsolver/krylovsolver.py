@@ -12,7 +12,8 @@ from qutip.expect import expect
 from qutip.ui.progressbar import BaseProgressBar, TextProgressBar
 from qutip.solver import Result
 from PyKrylovsolver.utils import _happy_breakdown, _make_partitions, optimizer
-
+import operator
+from functools import reduce
 
 def krylovsolve(
     H: Qobj,
@@ -171,9 +172,14 @@ def krylovsolve(
     t0 = tlist[0]
     
     # This Lanczos iteration it's reused for the first partition
-    krylov_basis, T_m = lanczos_algorithm(_H, _psi, krylov_dim=dim_m, sparse=sparse)
-    deltat = optimizer(T_m, krylov_basis=krylov_basis, tlist=tlist, tol=tolerance)
-    n_timesteps = int(ceil(tf / deltat))
+    krylov_basis, T_m= lanczos_algorithm(_H, _psi, krylov_dim=dim_m, sparse=sparse)
+
+    if krylov_basis.shape[0] != dim_m + 2:
+        deltat = (tf - t0) / 10
+    else:
+        deltat = optimizer(T_m, krylov_basis=krylov_basis, tlist=tlist, tol=tolerance)
+
+    n_timesteps = int(ceil((tf-t0) / deltat))
 
     partitions = _make_partitions(tlist=tlist, n_timesteps=n_timesteps)
 
@@ -215,6 +221,9 @@ def krylovsolve(
 
     if e_ops:
         for idx, op in enumerate(e_ops):
+            
+            op.dims = [[reduce(operator.mul, op.dims[0])], [reduce(operator.mul, op.dims[1])]]
+            
             krylov_results.expect.append(
                 [expect(op, state) for state in evolved_states]
             )
