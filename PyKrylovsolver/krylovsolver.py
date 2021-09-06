@@ -166,7 +166,10 @@ def krylovsolve(
         _psi = _psi / np.linalg.norm(_psi)
     # Optimization step
     dim_m = krylov_dim
-
+    
+    tf = tlist[-1]
+    t0 = tlist[0]
+    
     # This Lanczos iteration it's reused for the first partition
     krylov_basis, T_m = lanczos_algorithm(_H, _psi, krylov_dim=dim_m, sparse=sparse)
     deltat = optimizer(T_m, krylov_basis=krylov_basis, tlist=tlist, tol=tolerance)
@@ -191,8 +194,6 @@ def krylovsolve(
             krylov_results.states += [psi0]        
         return krylov_results
     
-    tf = tlist[-1]
-    t0 = tlist[0]
         
     # Lazy iteration
     psi_norm = np.linalg.norm(_psi)
