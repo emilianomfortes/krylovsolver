@@ -175,6 +175,7 @@ def krylovsolve(
     krylov_basis, T_m= lanczos_algorithm(_H, _psi, krylov_dim=dim_m, sparse=sparse)
 
     if krylov_basis.shape[0] != dim_m + 2:
+        print(krylov_basis.shape[0], dim_m+2)
         deltat = (tf - t0) / 10
     else:
         deltat = optimizer(T_m, krylov_basis=krylov_basis, tlist=tlist, tol=tolerance)
