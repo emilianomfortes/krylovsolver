@@ -1,7 +1,7 @@
-from qutip import *
+from qutip import mcsolve, tensor, fock, qeye, destroy, Options
 # from pylab import *
 import numpy as np
-from PyKrylovsolver.krylovsolver import krylovsolve
+from PyKrylovsolver.krylovsolve import krylovsolve
 from matplotlib import pyplot as plt
 
 if __name__ == '__main__':

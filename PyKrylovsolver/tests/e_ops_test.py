@@ -1,6 +1,6 @@
 from qutip import sigmax, basis, sesolve, sigmaz, jmat, Qobj
 import numpy as np
-from PyKrylovsolver.krylovsolver import krylovsolve
+from PyKrylovsolver.krylovsolve import krylovsolve
 
 
 H = 2*np.pi * 0.5 * jmat(30,'y')

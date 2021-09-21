@@ -3,6 +3,7 @@
 .venv
 **/__pycache__
 */.ipynb_checkpoints
+**/.png
 line_profiler
 /venv/
 .idea
