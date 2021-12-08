@@ -3,28 +3,31 @@ This module provides approximations of the time evolution operator
 using small dimensional Krylov subspaces.
 """
 
-from typing import List
-import numpy as np
-from math import ceil
-from scipy.linalg import expm, eigh
-from qutip.qobj import Qobj
-from qutip.expect import expect
-from qutip.ui.progressbar import BaseProgressBar, TextProgressBar
-from qutip.solver import Result
-from PyKrylovsolver.utils import _happy_breakdown, _make_partitions, optimizer
-import operator
 from functools import reduce
+from math import ceil
+import operator
+
+import numpy as np
+from qutip import mcsolve
+from qutip.expect import expect
+from qutip.qobj import Qobj
+from qutip.solver import Result
+from qutip.ui.progressbar import BaseProgressBar, TextProgressBar
+from scipy.linalg import eigh, expm
+
+from qutip import mcsolve
+
 
 def krylovsolve(
     H: Qobj,
     psi0: Qobj,
-    tlist: np.array = None,
+    tlist: np.array,
     krylov_dim: int = 30,
     e_ops=None,
     tolerance: float = 1e-7,
     store_states: bool = False,
     store_final_state: bool = False,
-    progress_bar: bool = False,
+    progress_bar: bool = None,
     sparse: bool = False,
 ):
     """
@@ -67,8 +70,7 @@ def krylovsolve(
          initial state vector (ket).
 
      tlist : None / *list* / *array*
-        List of times on which to evolve the initial state. If provided, it
-        overrides t0, tf and dt parameters.
+        List of times on which to evolve the initial state.
 
      krylov_dim: int
          Dimension of Krylov approximation subspaces used for the time
@@ -124,21 +126,17 @@ def krylovsolve(
 
     # verify that the hamiltonian meets the requirements
     assert isinstance(H, Qobj) | isinstance(
-        H, np.ndarray
-    ), "the Hamiltonian must be either a Qobj or a np.ndarray."
-    assert len(H.shape) == 2, "the Hamiltonian must be 2-dimensional."
-    assert (
-        H.shape[0] == H.shape[1]
-    ), "the Hamiltonian must be a square 2-dimensional."
-    assert (
-        H.shape[0] >= krylov_dim
-    ), "the Hamiltonian dimension must be greater or equal to the \
-            maximum allowed krylov dimension."
+        H,
+        np.ndarray), "the Hamiltonian must be either a Qobj or a np.ndarray."
 
-    # transform H from Qobj to np.ndarray for faster operations
-    assert isinstance(H, Qobj) | isinstance(
-        H, np.ndarray
-    ), "The Hamiltonian must be either a Qobj or a np.ndarray."
+    assert len(H.shape) == 2, "the Hamiltonian must be 2-dimensional."
+
+    assert (H.shape[0] == H.shape[1]
+            ), "the Hamiltonian must be a square 2-dimensional."
+
+    assert (H.shape[0] >= krylov_dim
+            ), "the Hamiltonian dimension must be greater or equal to the \
+            maximum allowed krylov dimension."
 
     if isinstance(H, Qobj):
         if sparse:
@@ -150,12 +148,11 @@ def krylovsolve(
 
     # verify that the state vector meets the requirements
     assert isinstance(psi0, Qobj) | isinstance(
-        psi0, np.ndarray
-    ), "The state vector must be either a Qobj or a np.ndarray."
+        psi0,
+        np.ndarray), "The state vector must be either a Qobj or a np.ndarray."
 
-    assert (
-        psi0.shape[0] == _H.shape[0]
-    ), "The state vector and the Hamiltonian must share the same \
+    assert (psi0.shape[0] == _H.shape[0]
+            ), "The state vector and the Hamiltonian must share the same \
         dimension."
 
     # transform state type from Qobj to np.ndarray for faster operations
@@ -165,22 +162,27 @@ def krylovsolve(
     else:
         _psi = psi0.copy()
         _psi = _psi / np.linalg.norm(_psi)
-    # Optimization step
+    # optimization step
     dim_m = krylov_dim
-    
+
     tf = tlist[-1]
     t0 = tlist[0]
-    
-    # This Lanczos iteration it's reused for the first partition
-    krylov_basis, T_m= lanczos_algorithm(_H, _psi, krylov_dim=dim_m, sparse=sparse)
+
+    # this Lanczos iteration it's reused for the first partition
+    krylov_basis, T_m = lanczos_algorithm(_H,
+                                          _psi,
+                                          krylov_dim=dim_m,
+                                          sparse=sparse)
 
     if krylov_basis.shape[0] != dim_m + 2:
-        print(krylov_basis.shape[0], dim_m+2)
         deltat = (tf - t0) / 10
     else:
-        deltat = optimizer(T_m, krylov_basis=krylov_basis, tlist=tlist, tol=tolerance)
+        deltat = optimizer(T_m,
+                           krylov_basis=krylov_basis,
+                           tlist=tlist,
+                           tol=tolerance)
 
-    n_timesteps = int(ceil((tf-t0) / deltat))
+    n_timesteps = int(ceil((tf - t0) / deltat))
 
     partitions = _make_partitions(tlist=tlist, n_timesteps=n_timesteps)
 
@@ -189,7 +191,7 @@ def krylovsolve(
 
     # create output container
     krylov_results = Result()
-    
+
     # if there is a unique time-step in tlist, the initial state (or its expectation value) is returned.
     if len(tlist) < 1:
         if e_ops:
@@ -198,11 +200,10 @@ def krylovsolve(
             if store_states or store_final_state:
                 krylov_results.states += [psi0]
         else:
-            krylov_results.states += [psi0]        
+            krylov_results.states += [psi0]
         return krylov_results
-    
-        
-    # Lazy iteration
+
+    # lazy iteration
     psi_norm = np.linalg.norm(_psi)
     evolved_states = _evolve_krylov_tlist(
         H=_H,
@@ -222,12 +223,12 @@ def krylovsolve(
 
     if e_ops:
         for idx, op in enumerate(e_ops):
-            
-            op.dims = [[reduce(operator.mul, op.dims[0])], [reduce(operator.mul, op.dims[1])]]
-            
+
+            op.dims = [[reduce(operator.mul, op.dims[0])],
+                       [reduce(operator.mul, op.dims[1])]]
+
             krylov_results.expect.append(
-                [expect(op, state) for state in evolved_states]
-            )
+                [expect(op, state) for state in evolved_states])
         if store_states:
             krylov_results.states += evolved_states
         if store_final_state:
@@ -245,7 +246,7 @@ def krylovsolve(
         if progress_bar:
             pbar.update(pdx)
 
-        # For each partition we calculate Lanczos
+        # for each partition we calculate Lanczos
         evolved_states = _evolve_krylov_tlist(
             H=_H,
             psi0=_psi,
@@ -283,7 +284,6 @@ def krylovsolve(
 
 
 def _estimate_norm(H: np.ndarray, order: int):
-
     """
      Estimates the norm-2 of a Hamiltonian using a Lanczos algorithm of
      dimension 'order'.
@@ -298,14 +298,14 @@ def _estimate_norm(H: np.ndarray, order: int):
          Order of the estimated norm.
      Returns
      ---------
+
      max_eigenvalue: float
          The maximum eigenvalue resulting from a lanczos algorithm of
          dimension 'order'.
     """
 
-    random_psi = np.random.random(H.shape[0]) + 1j * np.random.random(
-        H.shape[0]
-    )
+    random_psi = np.random.random(
+        H.shape[0]) + 1j * np.random.random(H.shape[0])
     random_psi = random_psi / np.linalg.norm(random_psi)
 
     _, T_m = lanczos_algorithm(H, psi0=random_psi, krylov_dim=order)
@@ -338,7 +338,7 @@ def dot_mul(A, v, sparse: bool = False):
         Resulting matrix multiplication.
     """
 
-    if sparse:  # A is an instance of scr_matrix, v is a np.array
+    if sparse:  # a is an instance of scr_matrix, v is a np.array
         return A.dot(v)
     else:
         return np.matmul(A, v)
@@ -374,10 +374,12 @@ def lanczos_algorithm(
 
     Returns
     ---------
-    v: float
-        The maximum eigenvalue resulting from a lanczos algorithm of
-        dimension 'order'.
-    T:
+
+    v: np.ndarray
+        Lanczos eigenvector.
+
+    T: np.ndarray
+        Tridiagonal decomposition.
     """
 
     v = np.zeros((krylov_dim + 2, psi.shape[0]), dtype=complex)
@@ -398,15 +400,13 @@ def lanczos_algorithm(
         beta = np.linalg.norm(w)
 
         if beta < 1e-7:
-            
-            v_happy = np.zeros([j,psi.shape[0]], dtype=complex)
-            T_m_happy = np.zeros([j,j], dtype=complex)
-            
-            v_happy = v[0:j,:]
-            T_m_happy = T_m[0:j,0:j]
-            
-            # v, T_m = _happy_breakdown(T_m, v, beta, w, j)
-            # print("is a happy breakdown!")
+
+            v_happy = np.zeros([j, psi.shape[0]], dtype=complex)
+            T_m_happy = np.zeros([j, j], dtype=complex)
+
+            v_happy = v[0:j, :]
+            T_m_happy = T_m[0:j, 0:j]
+
             return v_happy, T_m_happy
 
         v[j, :] = w / beta
@@ -473,7 +473,6 @@ def _evolve_krylov_tlist(
     T_m: np.array = None,
     sparse: bool = False,
 ):
-
     """
     Computes the Krylov approximation time evolution of dimension 'krylov_dim'
     for Hamiltonian 'H' and initial state 'psi0' for each time in 'tlist'.
@@ -522,11 +521,140 @@ def _evolve_krylov_tlist(
         psi = psi0
 
     if (krylov_basis is None) or (T_m is None):
-        krylov_basis, T_m = lanczos_algorithm(
-            H=H, psi=psi, krylov_dim=krylov_dim, sparse=sparse
-        )
+        krylov_basis, T_m = lanczos_algorithm(H=H,
+                                              psi=psi,
+                                              krylov_dim=krylov_dim,
+                                              sparse=sparse)
 
     evolve = _evolve(t0, krylov_basis, T_m)
     psi_list = list(map(evolve, tlist))
 
     return psi_list
+
+# ----------------------------------------------------------------------
+# Auxiliar functions
+
+def _make_partitions(tlist, n_timesteps):
+    if n_timesteps == 1:
+        partitions = [np.insert(tlist, 0, tlist[0])]
+        return partitions
+    n_timesteps += 1
+    krylov_tlist = np.linspace(tlist[0], tlist[-1], n_timesteps)
+    krylov_partitions = [
+        np.array(krylov_tlist[i:i + 2]) for i in range(n_timesteps - 1)
+    ]
+    partitions = []
+    _tlist = np.copy(tlist)
+    for krylov_partition in krylov_partitions:
+        start = krylov_partition[0]
+        end = krylov_partition[-1]
+        condition = _tlist <= end
+        partitions.append([start] + _tlist[condition].tolist() + [end])
+        _tlist = _tlist[~condition]
+    return partitions
+
+
+def _happy_breakdown(T_m, v, beta, w, j):
+    v = v[0:j + 1, :]
+    v[j + 1, :] = w / beta
+
+    T_m = T_m[0:j, 0:j]
+
+    T_m[j + 2, j + 1] = beta
+
+    return v, T_m
+
+
+def bound_function(T, krylov_basis, t0, tf):
+    eigenvalues1, eigenvectors1 = eigh(T[0:, 0:])
+    U1 = np.matmul(krylov_basis[0:, 0:].T, eigenvectors1)
+    e01 = eigenvectors1.conj().T[:, 0]
+
+    eigenvalues2, eigenvectors2 = eigh(T[0:-1, 0:T.shape[1] - 1])
+    U2 = np.matmul(krylov_basis[0:-1, :].T, eigenvectors2)
+    e02 = eigenvectors2.conj().T[:, 0]
+
+    def f(t):
+        delta_t = -1j * (t - t0)
+
+        aux1 = np.multiply(np.exp(delta_t * eigenvalues1), e01)
+        psi1 = np.matmul(U1, aux1)
+
+        aux2 = np.multiply(np.exp(delta_t * eigenvalues2), e02)
+        psi2 = np.matmul(U2, aux2)
+
+        error = np.linalg.norm(psi1 - psi2)
+
+        steps = 1 if t == t0 else max(1, tf // (t - t0))
+        return np.log10(error) + np.log10(steps)
+
+    return f
+
+
+def illinois_algorithm(f, a, b, y, margin=1e-5):
+    """
+    Bracketed approach of Root-finding with illinois method.
+
+    Parameters
+    ----------
+
+    f : callable
+        Continuous function.
+
+    a : float
+        Lower bound to be searched.
+
+    b : float
+        Upper bound to be searched.
+
+    y : float
+        Target value.
+
+    margin : float
+        Margin of error in absolute term.
+
+    Returns
+    -------
+    c : float
+        Value where f(c) is within the margin of y.
+    """
+
+    lower = f(a)
+    upper = f(b)
+
+    assert lower <= y, f"y is smaller than the lower bound. {y} < {lower}"
+
+    if upper <= y:
+        return b
+
+    stagnant = 0
+
+    while True:
+        c = ((a * (upper - y)) - (b * (lower - y))) / (upper - lower)
+
+        y_c = f(c)
+        if abs((y_c) - y) < margin:
+            # found!
+            return c
+        elif y < y_c:
+            b, upper = c, y_c
+            if stagnant == -1:
+                # Lower bound is stagnant!
+                lower += (y - lower) / 2
+            stagnant = -1
+        else:
+            a, lower = c, y_c
+            if stagnant == 1:
+                # Upper bound is stagnant!
+                upper -= (upper - y) / 2
+            stagnant = 1
+
+
+def optimizer(T, krylov_basis, tlist, tol):
+    f = bound_function(T, krylov_basis=krylov_basis, t0=tlist[0], tf=tlist[-1])
+    n = illinois_algorithm(f,
+                           a=tlist[0],
+                           b=tlist[-1],
+                           y=np.log10(tol),
+                           margin=0.1)
+    return n
