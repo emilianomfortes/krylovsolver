@@ -15,7 +15,9 @@ Support
 
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=flat)](https://unitary.fund)
 
-We are proud to have received a grant to develop this open-source code from [Unitary Fund](https://unitary.fund). We have also received funding from the Faculty of Exact and Natural Sciences at the University of Buenos Aires.
+We are proud to have received a grant to develop this open-source code from [Unitary Fund](https://unitary.fund). We have also received funding from the Faculty of Exact and Natural Sciences at the University of Buenos Aires. 
+
+This project has also led us to develop a new error-bound for [Krylov's method](https://en.wikipedia.org/wiki/Krylov_subspace) by interpreting Krylov's subspace as a tight-binding model. You can find the details in our preprint [Loschmidt echo approach to Krylov-subspace approximation error estimation](https://arxiv.org/abs/2107.09805).
 
 Installation
 -------------
@@ -27,7 +29,7 @@ numpy
 scipy
 ```
 
-PyKrylovSolver is not currently in PyPi. You can install directly from GitHub by doing
+PyKrylovSolver is not currently in PyPi. However, you can install it directly from GitHub by doing
 ```
 pip install git+https://github.com/emilianomfortes/krylovsolver/
 ```
@@ -35,19 +37,19 @@ pip install git+https://github.com/emilianomfortes/krylovsolver/
 Documentation
 -------------
 
- Time evolution of state vectors for time independent Hamiltonians.
-
- Evolve the state vector ("psi0") finding an approximation for the time 
- evolution operator of Hamiltonian ("H") by obtaining the projection of 
- the time evolution operator on a set of small dimensional Krylov 
- subspaces (m<<dim(H)).
-
- The output is either the state vector or the expectation values of supplied 
- operators ("e_ops"), computed at each time in a list ("tlist"). 
+ Time evolution of state vectors for time-independent Hamiltonians.
+ 
+ Evolve the state vector ("psi0"), using an approximation for the time 
+ evolution operator ("U") of Hamiltonian ("H") obtained via the 
+ projection of U on a set of small dimensional Krylov subspaces (m<<dim(H)).
+ 
+ The output is either the state vectors or the expectation values of 
+ supplied operators ("e_ops"), obtained from evolving "psi0" at 
+ each time in a list ("tlist").
  
  **Additional options**
 
- Additional options to krylovsolve can be set with the following:
+ Additional options are available:
 
  "store_states": stores states even though expectation values are requested
  via the "e_ops" argument.
@@ -129,18 +131,11 @@ tlist = np.linspace(0, 1, 100)
 psi_evolved = krylovsolve(H, psi, tlist=tlist, tolerance=1e-2, krylov_dim=5, progress_bar=False, sparse=True)
 ```
 
-Krylov Aproximation
--------------------
-
-
 Contribute
 ----------
 
-You are most welcome to contribute in the development of the algorithm by forking this repository and sending pull requests, or filing bug reports at the [issues page](https://github.com/emilianomfortes/krylovsolver/issues).
-Any code contributions will be acknowledged in the upcoming contributors section in the documentation.
-
+You are welcome to contribute to the development of the algorithm by forking this repository and sending pull requests or filling bug reports at the [issues page](https://github.com/emilianomfortes/krylovsolver/issues) page. Any code contribution is wished and will get acknowledged in the documentation.
 
 Citing
 ------------
-
-If you use our error bound approach for the Krylov approximation in your research, please cite the original paper available [here](https://arxiv.org/abs/2107.09805).
+Please cite the original [paper](https://arxiv.org/abs/2107.09805) available here if you use our error bound approach for the Krylov approximation in your research.
