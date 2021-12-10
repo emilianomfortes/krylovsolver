@@ -61,5 +61,5 @@ if __name__ == '__main__':
 
     print(f'InFidelity between Krylov and sesolve in Random Hamiltonian: {diff_random:.2e}')
     print(f'InFidelity between Krylov and sesolve in Random Ising: {diff_ising:.2e}')
-    print(f'InFidelity between Krylov and sesolve in Random Harmonic Osilator: {diff_sho:.2e}')
+    print(f'InFidelity between Krylov and sesolve in Random Harmonic Oscillator: {diff_sho:.2e}')
     print(f'InFidelity between Krylov and sesolve in Spin y: {diff_spin_y:.2e}')
