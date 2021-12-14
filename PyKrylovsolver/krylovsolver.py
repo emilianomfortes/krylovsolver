@@ -17,16 +17,16 @@ from scipy.linalg import eigh, expm
 
 
 def krylovsolve(
-        H: Qobj,
-        psi0: Qobj,
-        tlist: np.array,
-        krylov_dim: int = 30,
-        e_ops=None,
-        tolerance: float = 1e-7,
-        store_states: bool = False,
-        store_final_state: bool = False,
-        progress_bar: bool = None,
-        sparse: bool = False,
+    H: Qobj,
+    psi0: Qobj,
+    tlist: np.array,
+    krylov_dim: int = 30,
+    e_ops=None,
+    tolerance: float = 1e-7,
+    store_states: bool = False,
+    store_final_state: bool = False,
+    progress_bar: bool = None,
+    sparse: bool = False,
 ):
     """
     Time evolution of state vectors for time independent Hamiltonians.
@@ -98,18 +98,16 @@ def krylovsolve(
 
     # verify that the hamiltonian meets the requirements
     assert isinstance(H, Qobj) | isinstance(
-        H, np.ndarray
-    ), "the Hamiltonian must be either a Qobj or a np.ndarray."
+        H,
+        np.ndarray), "the Hamiltonian must be either a Qobj or a np.ndarray."
 
     assert len(H.shape) == 2, "the Hamiltonian must be 2-dimensional."
 
-    assert (
-            H.shape[0] == H.shape[1]
-    ), "the Hamiltonian must be a square 2-dimensional."
+    assert (H.shape[0] == H.shape[1]
+            ), "the Hamiltonian must be a square 2-dimensional."
 
-    assert (
-            H.shape[0] >= krylov_dim
-    ), "the Hamiltonian dimension must be greater or equal to the \
+    assert (H.shape[0] >= krylov_dim
+            ), "the Hamiltonian dimension must be greater or equal to the \
             maximum allowed krylov dimension."
 
     if isinstance(H, Qobj):
@@ -122,12 +120,11 @@ def krylovsolve(
 
     # verify that the state vector meets the requirements
     assert isinstance(psi0, Qobj) | isinstance(
-        psi0, np.ndarray
-    ), "The state vector must be either a Qobj or a np.ndarray."
+        psi0,
+        np.ndarray), "The state vector must be either a Qobj or a np.ndarray."
 
-    assert (
-            psi0.shape[0] == _H.shape[0]
-    ), "The state vector and the Hamiltonian must share the same \
+    assert (psi0.shape[0] == _H.shape[0]
+            ), "The state vector and the Hamiltonian must share the same \
         dimension."
 
     # transform state type from Qobj to np.ndarray for faster operations
@@ -140,13 +137,14 @@ def krylovsolve(
 
     k_solve = KSolve(tlist, krylov_dim, sparse, progress_bar, pbar, tolerance)
 
-    krylov_results = k_solve.solve(_H, _psi, e_ops, store_states, store_final_state)
+    krylov_results = k_solve.solve(_H, _psi, e_ops, store_states,
+                                   store_final_state)
     return krylov_results
 
 
 class KSolve:
-
-    def __init__(self, tlist, krylov_dim, sparse, progress_bar, pbar, tolerance):
+    def __init__(self, tlist, krylov_dim, sparse, progress_bar, pbar,
+                 tolerance):
         self.tlist = tlist
         self.krylov_dim = krylov_dim
         self.sparse = sparse
@@ -160,13 +158,15 @@ class KSolve:
         self.__last_k_basis, self.__last_T_m = None, None
 
     def lanczos_algorithm(self, H, psi):
-        krylov_basis, T_m = lanczos_algorithm(H, psi, self.krylov_dim, self.sparse)
+        krylov_basis, T_m = lanczos_algorithm(H, psi, self.krylov_dim,
+                                              self.sparse)
         self.__last_T_m = T_m
         self.__last_k_basis = krylov_basis
         return krylov_basis, T_m
 
     def get_dt(self):
-        assert (self.__last_T_m is not None) & (self.__last_k_basis is not None), "First Run lanczos_algorithm"
+        assert (self.__last_T_m is not None) & (
+            self.__last_k_basis is not None), "First Run lanczos_algorithm"
 
         self.n_timesteps = _calculate_dt(
             T_m=self.__last_T_m,
@@ -181,7 +181,8 @@ class KSolve:
     def get_partitions(self):
         assert self.n_timesteps is not None, "First run get_dt"
 
-        self.partitions = _make_partitions(tlist=self.tlist, n_timesteps=self.n_timesteps)
+        self.partitions = _make_partitions(tlist=self.tlist,
+                                           n_timesteps=self.n_timesteps)
 
     def setup_solver(self, H, psi):
         # Set up to make partitions
@@ -204,7 +205,8 @@ class KSolve:
         evolved_states = [Qobj(state) for state in evolved_states]
         return _psi, psi_norm, evolved_states
 
-    def add_results(self, estates, e_ops, store_states, store_final_state, results, step):
+    def add_results(self, estates, e_ops, store_states, store_final_state,
+                    results, step):
         if e_ops:
             for idx, op in enumerate(e_ops):
                 op.dims = [
@@ -212,9 +214,7 @@ class KSolve:
                     [reduce(operator.mul, op.dims[1])],
                 ]
 
-                results.expect.append(
-                    [expect(op, state) for state in estates]
-                )
+                results.expect.append([expect(op, state) for state in estates])
             if store_states:
                 results.states += estates
             if store_final_state:
@@ -254,9 +254,12 @@ class KSolve:
             sparse=self.sparse,
         )
         _psi, psi_norm, evolved_states = self.prepare_next_step(evolved_states)
-        krylov_results, last_t = self.add_results(evolved_states, e_ops,
+        krylov_results, last_t = self.add_results(evolved_states,
+                                                  e_ops,
                                                   store_states,
-                                                  store_final_state, krylov_results, step=0)
+                                                  store_final_state,
+                                                  krylov_results,
+                                                  step=0)
 
         self.update_progress_bar(0)
         for pdx, partition in enumerate(self.partitions[1:]):
@@ -272,10 +275,14 @@ class KSolve:
                 psi_norm=psi_norm,
                 sparse=self.sparse,
             )
-            _psi, psi_norm, evolved_states = self.prepare_next_step(evolved_states)
-            krylov_results, last_t = self.add_results(evolved_states, e_ops,
+            _psi, psi_norm, evolved_states = self.prepare_next_step(
+                evolved_states)
+            krylov_results, last_t = self.add_results(evolved_states,
+                                                      e_ops,
                                                       store_states,
-                                                      store_final_state, krylov_results, step=pdx)
+                                                      store_final_state,
+                                                      krylov_results,
+                                                      step=pdx)
         self.update_progress_bar(None)
 
         return krylov_results
@@ -298,9 +305,8 @@ def _estimate_norm(H: np.ndarray, order: int):
          dimension 'order'.
     """
 
-    random_psi = np.random.random(H.shape[0]) + 1j * np.random.random(
-        H.shape[0]
-    )
+    random_psi = np.random.random(
+        H.shape[0]) + 1j * np.random.random(H.shape[0])
     random_psi = random_psi / np.linalg.norm(random_psi)
 
     _, T_m = lanczos_algorithm(H, psi=random_psi, krylov_dim=order)
@@ -335,10 +341,10 @@ def dot_mul(A, v, sparse: bool = False):
 
 
 def lanczos_algorithm(
-        H,
-        psi: np.ndarray,
-        krylov_dim: int,
-        sparse: bool = False,
+    H,
+    psi: np.ndarray,
+    krylov_dim: int,
+    sparse: bool = False,
 ):
     """
     Computes a basis of the Krylov subspace for Hamiltonian 'H', a system
@@ -439,15 +445,15 @@ def _evolve(t0: float, krylov_basis: np.ndarray, T_m: np.ndarray):
 
 
 def _evolve_krylov_tlist(
-        H,
-        psi0: np.ndarray,
-        krylov_dim: int,
-        tlist: list,
-        t0: float,
-        psi_norm: float = None,
-        krylov_basis: np.array = None,
-        T_m: np.array = None,
-        sparse: bool = False,
+    H,
+    psi0: np.ndarray,
+    krylov_dim: int,
+    tlist: list,
+    t0: float,
+    psi_norm: float = None,
+    krylov_basis: np.array = None,
+    T_m: np.array = None,
+    sparse: bool = False,
 ):
     """
     Computes the Krylov approximation time evolution of dimension 'krylov_dim'
@@ -487,9 +493,10 @@ def _evolve_krylov_tlist(
         psi = psi0
 
     if (krylov_basis is None) or (T_m is None):
-        krylov_basis, T_m = lanczos_algorithm(
-            H=H, psi=psi, krylov_dim=krylov_dim, sparse=sparse
-        )
+        krylov_basis, T_m = lanczos_algorithm(H=H,
+                                              psi=psi,
+                                              krylov_dim=krylov_dim,
+                                              sparse=sparse)
 
     evolve = _evolve(t0, krylov_basis, T_m)
     psi_list = list(map(evolve, tlist))
@@ -505,9 +512,10 @@ def _calculate_dt(T_m, krylov_basis, dim_m, tf, t0, tlist, tolerance):
     if krylov_basis.shape[0] != dim_m + 2:
         deltat = (tf - t0) / 10
     else:
-        deltat = optimizer(
-            T_m, krylov_basis=krylov_basis, tlist=tlist, tol=tolerance
-        )
+        deltat = optimizer(T_m,
+                           krylov_basis=krylov_basis,
+                           tlist=tlist,
+                           tol=tolerance)
 
     return int(ceil((tf - t0) / deltat))  # n_timesteps
 
@@ -519,7 +527,7 @@ def _make_partitions(tlist, n_timesteps):
     n_timesteps += 1
     krylov_tlist = np.linspace(tlist[0], tlist[-1], n_timesteps)
     krylov_partitions = [
-        np.array(krylov_tlist[i: i + 2]) for i in range(n_timesteps - 1)
+        np.array(krylov_tlist[i:i + 2]) for i in range(n_timesteps - 1)
     ]
     partitions = []
     _tlist = np.copy(tlist)
@@ -533,7 +541,7 @@ def _make_partitions(tlist, n_timesteps):
 
 
 def _happy_breakdown(T_m, v, beta, w, j):
-    v = v[0: j + 1, :]
+    v = v[0:j + 1, :]
     v[j + 1, :] = w / beta
 
     T_m = T_m[0:j, 0:j]
@@ -548,7 +556,7 @@ def bound_function(T, krylov_basis, t0, tf):
     U1 = np.matmul(krylov_basis[0:, 0:].T, eigenvectors1)
     e01 = eigenvectors1.conj().T[:, 0]
 
-    eigenvalues2, eigenvectors2 = eigh(T[0:-1, 0: T.shape[1] - 1])
+    eigenvalues2, eigenvectors2 = eigh(T[0:-1, 0:T.shape[1] - 1])
     U2 = np.matmul(krylov_basis[0:-1, :].T, eigenvectors2)
     e02 = eigenvectors2.conj().T[:, 0]
 
@@ -623,15 +631,19 @@ def illinois_algorithm(f, a, b, y, margin=1e-5):
 
 def optimizer(T, krylov_basis, tlist, tol):
     f = bound_function(T, krylov_basis=krylov_basis, t0=tlist[0], tf=tlist[-1])
-    n = illinois_algorithm(
-        f, a=tlist[0], b=tlist[-1], y=np.log10(tol), margin=0.1
-    )
+    n = illinois_algorithm(f,
+                           a=tlist[0],
+                           b=tlist[-1],
+                           y=np.log10(tol),
+                           margin=0.1)
     return n
 
 
-def _dummy_krylov(
-        krylov_results, psi0, store_states=None, store_final_state=None, e_ops=None
-):
+def _dummy_krylov(krylov_results,
+                  psi0,
+                  store_states=None,
+                  store_final_state=None,
+                  e_ops=None):
     if e_ops:
         for idx, op in enumerate(e_ops):
             krylov_results.expect[idx] += [expect(op, psi0)]
