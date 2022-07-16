@@ -1,3 +1,5 @@
+import time
+
 from PyKrylovsolver.krylovsolver import krylovsolve
 from PyKrylovsolver.hamiltonians import h_sho, h_random, h_ising_transverse
 from qutip.qobj import Qobj
@@ -52,14 +54,18 @@ def test_vs_sesolve(N=9, hamiltonian='random'):
 
 
 if __name__ == '__main__':
-    basic_test(N=9)
 
-    diff_random = test_vs_sesolve(N=9, hamiltonian='random')
-    diff_ising = test_vs_sesolve(N=9, hamiltonian='ising')
-    diff_sho = test_vs_sesolve(N=9, hamiltonian='sho')
-    diff_spin_y = test_vs_sesolve(N=9, hamiltonian='spin_y')
+    t0 = time.time()
+    basic_test(N=13)
+    t1 = time.time()
 
-    print(f'InFidelity between Krylov and sesolve in Random Hamiltonian: {diff_random:.2e}')
-    print(f'InFidelity between Krylov and sesolve in Random Ising: {diff_ising:.2e}')
-    print(f'InFidelity between Krylov and sesolve in Random Harmonic Oscillator: {diff_sho:.2e}')
-    print(f'InFidelity between Krylov and sesolve in Spin y: {diff_spin_y:.2e}')
+    print(t1-t0)
+    # diff_random = test_vs_sesolve(N=12, hamiltonian='random')
+    # diff_ising = test_vs_sesolve(N=9, hamiltonian='ising')
+    # diff_sho = test_vs_sesolve(N=9, hamiltonian='sho')
+    # diff_spin_y = test_vs_sesolve(N=13, hamiltonian='spin_y')
+
+    # print(f'InFidelity between Krylov and sesolve in Random Hamiltonian: {diff_random:.2e}')
+    # print(f'InFidelity between Krylov and sesolve in Random Ising: {diff_ising:.2e}')
+    # print(f'InFidelity between Krylov and sesolve in Random Harmonic Oscillator: {diff_sho:.2e}')
+    # print(f'InFidelity between Krylov and sesolve in Spin y: {diff_spin_y:.2e}')
